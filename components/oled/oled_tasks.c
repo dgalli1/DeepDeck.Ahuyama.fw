@@ -67,19 +67,20 @@ void update_oled(void)
 {
 	if (xQueueReceive(layer_recieve_q, &curr_layout, (TickType_t)0))
 	{
-
 		//write layout name
 		erase_area(0, 0, 128, 22);
-		u8g2_SetFont(&u8g2, u8g2_font_6x10_tf);
-		u8g2_DrawStr(&u8g2, 0,8, key_layouts[curr_layout].name);
-		//write each column with mappings
+		u8g2_SetFont(&u8g2, u8g2_font_7x13_tf);
+		int str_width = u8g2_GetStrWidth(&u8g2, key_layouts[curr_layout].name);
+		int display_width = u8g2_GetDisplayWidth(&u8g2);
+		int x = (display_width - str_width) / 2;
+		u8g2_DrawStr(&u8g2, x, 14, key_layouts[curr_layout].name);		//write each column with mappings
 		erase_area(0, 22, 128, 28);
-		u8g2_SetFont(&u8g2, u8g2_font_6x10_tf);
+		u8g2_SetFont(&u8g2, u8g2_font_5x8_tf);
 		for (int i = 0; i < MATRIX_COLS; i++)
 		{
 			for (int j = 0; j < MATRIX_ROWS; j++)
 			{
-				u8g2_DrawStr(&u8g2, j * 32, 23 + i * 9, key_layouts[curr_layout].key_map_names[i][j]);
+				u8g2_DrawStr(&u8g2, j * 32, 23 + i * 12, key_layouts[curr_layout].key_map_names[i][j]);
 			}
 		}
 
