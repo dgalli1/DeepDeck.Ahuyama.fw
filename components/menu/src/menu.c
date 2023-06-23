@@ -471,18 +471,6 @@ void menu_command(encoder_state_t encoder_action)
 }
 
 
-void menu_init(void)
-{
-    // char titles[5][110] = {"DeepDeck\nMainMenu", "Bluetooth Options\nLED test mode\nSleep Mode\netc\netc1\netc2"};
-    // ESP_LOGI("MENU", "%s",titles[0]);
-    // ESP_LOGI("MENU", "%s",titles[1]);
-    // menu_main.title = titles[0]; 
-    // menu_main.subtitle = titles[1]; 
-    // menu_main.menu_item_array = &menu_bluetooth; 
-
-
-}
-
 uint8_t goto_sleep = false;
 menu_ret menu_goto_sleep(void)
 {

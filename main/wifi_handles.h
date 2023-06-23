@@ -60,4 +60,8 @@ void wifi_scan_sta(void);
 void wifiInit(void *params);
 void start_mdns_service();
 void resetWifi(void *params);
+
+/** @brief Get connection status
+ * @return 0 if not connected, != 0 if connected */
+uint8_t wifiIsConnected(void);
 #endif

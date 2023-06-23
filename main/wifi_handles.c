@@ -296,6 +296,17 @@ void resetWifi(void *params)
 	vTaskDelete(NULL);
 }
 
+
+
+/** @brief Get connection status
+ * @return 0 if not connected, != 0 if connected */
+uint8_t wifiIsConnected(void) {
+	if (wifi_connected == false)
+		return 0;
+	else
+		return 1;
+}
+
 void wifiInit(void *params)
 {
 	init_fs();

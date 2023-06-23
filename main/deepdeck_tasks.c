@@ -28,6 +28,7 @@
 
 #include "keycode_conv.h"
 #include "gesture_handles.h"
+#include "wifi_handles.h"
 
 static const char *TAG = "KeyReport";
 
@@ -57,7 +58,7 @@ void oled_task(void *pvParameters) {
 	while (1) {
 		switch (deepdeck_status) {
 		case S_NORMAL:
-			if (true) { //@todo this was a check for ble should be mqtt
+			if (!wifiIsConnected()) { //@todo this was a check for ble should be mqtt
 				if (CON_LOG_FLAG == false) {
 					ESP_LOGI(TAG, "Not connected, waiting for connection ");
 				}
@@ -70,8 +71,6 @@ void oled_task(void *pvParameters) {
 			}
 			break;
 		case S_SETTINGS:
-			menu_init();
-
 			vTaskDelay(pdMS_TO_TICKS(200));
 
 			menu_screen();

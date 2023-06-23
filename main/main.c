@@ -171,7 +171,6 @@ void app_main()
 #ifdef OLED_ENABLE
 	init_oled(ROTATION);
 
-	splashScreen();
 	vTaskDelay(pdMS_TO_TICKS(1000));
 
 	xTaskCreate(oled_task, "oled task", 1024 * 4, NULL,

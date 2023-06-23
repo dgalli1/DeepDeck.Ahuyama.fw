@@ -68,49 +68,50 @@ void update_oled(void)
 	if (xQueueReceive(layer_recieve_q, &curr_layout, (TickType_t)0))
 	{
 
-		erase_area(0, 13, 128, 22);
-		u8g2_SetFont(&u8g2, u8g2_font_courB24_tf);
-		u8g2_DrawStr(&u8g2, 0, 35, key_layouts[curr_layout].name);
-
-		erase_area(0, 35, 128, 28);
-		u8g2_SetFont(&u8g2, u8g2_font_5x7_tf);
+		//write layout name
+		erase_area(0, 0, 128, 22);
+		u8g2_SetFont(&u8g2, u8g2_font_6x10_tf);
+		u8g2_DrawStr(&u8g2, 0,8, key_layouts[curr_layout].name);
+		//write each column with mappings
+		erase_area(0, 22, 128, 28);
+		u8g2_SetFont(&u8g2, u8g2_font_6x10_tf);
 		for (int i = 0; i < MATRIX_COLS; i++)
 		{
 			for (int j = 0; j < MATRIX_ROWS; j++)
 			{
-				u8g2_DrawStr(&u8g2, j * 32, 42 + i * 7, key_layouts[curr_layout].key_map_names[i][j]);
+				u8g2_DrawStr(&u8g2, j * 32, 23 + i * 9, key_layouts[curr_layout].key_map_names[i][j]);
 			}
 		}
 
 		u8g2_SendBuffer(&u8g2);
 	}
-	if (xQueueReceive(led_recieve_q, &current_led, (TickType_t)0))
-	{
-		erase_area(0, 24, 127, 8);
-		if (CHECK_BIT(current_led, 0) != 0)
-		{
-			u8g2_SetFont(&u8g2, u8g2_font_5x7_tf);
-			u8g2_DrawStr(&u8g2, 0, 31, "NUM");
-			u8g2_SetFont(&u8g2, u8g2_font_open_iconic_all_1x_t);
-			u8g2_DrawGlyph(&u8g2, 16, 32, LOCK_ICON);
-		}
-
-		if (CHECK_BIT(current_led, 1) != 0)
-		{
-			u8g2_SetFont(&u8g2, u8g2_font_5x7_tf);
-			u8g2_DrawStr(&u8g2, 27, 31, "CAPS");
-			u8g2_SetFont(&u8g2, u8g2_font_open_iconic_all_1x_t);
-			u8g2_DrawGlyph(&u8g2, 48, 32, LOCK_ICON);
-		}
-		if (CHECK_BIT(current_led, 2) != 0)
-		{
-			u8g2_SetFont(&u8g2, u8g2_font_5x7_tf);
-			u8g2_DrawStr(&u8g2, 57, 31, "SCROLL");
-			u8g2_SetFont(&u8g2, u8g2_font_open_iconic_all_1x_t);
-			u8g2_DrawGlyph(&u8g2, 88, 32, LOCK_ICON);
-		}
-		u8g2_SendBuffer(&u8g2);
-	}
+	// if (xQueueReceive(led_recieve_q, &current_led, (TickType_t)0))
+	// {
+	// 	erase_area(0, 24, 127, 8);
+	// 	if (CHECK_BIT(current_led, 0) != 0)
+	// 	{
+	// 		u8g2_SetFont(&u8g2, u8g2_font_5x7_tf);
+	// 		u8g2_DrawStr(&u8g2, 0, 31, "NUM");
+	// 		u8g2_SetFont(&u8g2, u8g2_font_open_iconic_all_1x_t);
+	// 		u8g2_DrawGlyph(&u8g2, 16, 32, LOCK_ICON);
+	// 	}
+// 
+	// 	if (CHECK_BIT(current_led, 1) != 0)
+	// 	{
+	// 		u8g2_SetFont(&u8g2, u8g2_font_5x7_tf);
+	// 		u8g2_DrawStr(&u8g2, 27, 31, "CAPS");
+	// 		u8g2_SetFont(&u8g2, u8g2_font_open_iconic_all_1x_t);
+	// 		u8g2_DrawGlyph(&u8g2, 48, 32, LOCK_ICON);
+	// 	}
+	// 	if (CHECK_BIT(current_led, 2) != 0)
+	// 	{
+	// 		u8g2_SetFont(&u8g2, u8g2_font_5x7_tf);
+	// 		u8g2_DrawStr(&u8g2, 57, 31, "SCROLL");
+	// 		u8g2_SetFont(&u8g2, u8g2_font_open_iconic_all_1x_t);
+	// 		u8g2_DrawGlyph(&u8g2, 88, 32, LOCK_ICON);
+	// 	}
+	// 	u8g2_SendBuffer(&u8g2);
+	// }
 }
 
 
@@ -130,13 +131,12 @@ void waiting_oled(void)
 	char conn[] = "connection";
 
 	u8g2_ClearBuffer(&u8g2);
-	u8g2_SetFont(&u8g2, u8g2_font_open_iconic_all_1x_t);
 	u8g2_SetFont(&u8g2, u8g2_font_5x7_tf);
 
 	char buf[sizeof(uint32_t)];
 	for (int i = 0; i < 3; i++)
 	{
-		u8g2_DrawStr(&u8g2, 0, 26, waiting);
+		u8g2_DrawStr(&u8g2, 0, 10, waiting);
 		u8g2_DrawStr(&u8g2, 0, 40, conn);
 		u8g2_SendBuffer(&u8g2);
 		vTaskDelay(100 / portTICK_PERIOD_MS);
