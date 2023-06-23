@@ -15,7 +15,7 @@
 #include "freertos/event_groups.h"
 #include "oled_tasks.h"
 
-#define FIRMWARE_VERSION "0.5.4"
+#define FIRMWARE_VERSION "3.5.4"
 #define MODULE_ID "ESP32"
 #define GATTS_TAG "Ahuyama" // The device's name
 #define MAX_BT_DEVICENAME_LENGTH 40
@@ -80,8 +80,6 @@
  * Please read check battery_monitor.h for resistor values before applying
  * use ADC1 only,  */
 
-//#define BATT_STAT //define to enable battery monitoring
-#define BATT_PIN ADC1_CHANNEL_7 //gpio pin 35, refer to the esp32 before modifying
 
 //deep sleep parameters, mind that reconnecting after deep sleep might take a minute or two
 //#define SLEEP_MINS 50 // undefine if you do not need deep sleep, otherwise define number of minutes for deepsleep

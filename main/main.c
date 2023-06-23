@@ -49,8 +49,6 @@
 #include "esp_event.h"
 #include "esp_log.h"
 #include "nvs_flash.h"
-#include "esp_bt.h"
-#include "esp_bt_main.h"
 #include "driver/gpio.h"
 #include "driver/rtc_io.h"
 #include "driver/touch_pad.h"
@@ -58,14 +56,10 @@
 #include "esp_sleep.h"
 #include "esp_pm.h"
 
-// HID Ble functions
-#include "hal_ble.h"
-
 // Deepdeck functions
 #include "matrix.h"
 #include "keymap.h"
 #include "keyboard_config.h"
-#include "battery_monitor.h"
 #include "nvs_funcs.h"
 #include "nvs_keymaps.h"
 #include "mqtt.h"
@@ -76,10 +70,14 @@
 #include "deepdeck_tasks.h"
 #include "gesture_handles.h"
 #include "wifi_handles.h"
-#include "server.h"
 #include "spiffs.h"
+#include "queue.h"
+
+
 
 #define BASE_PRIORITY 5
+
+
 
 // plugin functions
 static config_data_t config;
@@ -143,7 +141,7 @@ void app_main()
 	nvs_load_macros();
 
 	// activate keyboard BT stack
-	halBLEInit(1, 1, 1, 0);
+	init_queues();
 	ESP_LOGI("HIDD", "MAIN finished...");
 
 	// init i2c
@@ -203,12 +201,6 @@ void app_main()
 	ESP_LOGI("Keyboard task", "initialized");
 #endif
 
-#ifdef BATT_STAT
-	init_batt_monitor();
-	xTaskCreate(battery_reports, "battery reporst", 4096, NULL,
-				BASE_PRIORITY, NULL);
-	ESP_LOGI("Battery monitor", "initialized");
-#endif
 
 #ifdef SLEEP_MINS
 	xTaskCreate(deep_sleep, "deep sleep task", 4096, NULL,

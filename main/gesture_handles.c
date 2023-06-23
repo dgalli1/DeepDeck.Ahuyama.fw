@@ -22,8 +22,6 @@
 #include "freertos/semphr.h"
 #include "freertos/task.h"
 #include "freertos/timers.h"
-//HID Ble functions
-#include "hal_ble.h"
 
 TaskHandle_t xGesture;
 
@@ -199,92 +197,17 @@ void gesture_command(uint8_t command, uint16_t gesture_commands[GESTURE_SIZE]) {
 				;
 				break;
 			}
-
-			xQueueSend(media_q, (void* )&media_state, (TickType_t ) 0); // Send Command
+			// @todo those probably try to send via BLE
+			// xQueueSend(media_q, (void* )&media_state, (TickType_t ) 0); // Send Command
 			media_state[0] = 0;
 			media_state[1] = 0;
-			xQueueSend(media_q, (void* )&media_state, (TickType_t ) 0); // Reset command
-		}
-		//Review mouse actions
-//        else if(action >= KC_MS_UP && action <= KC_MS_ACCEL2)
-//        {
-//            switch(action)
-//            {
-//                case KC_MS_UP:
-//                    mouse_state[2] = 15;
-//                    break;
-//
-//                case KC_MS_DOWN:
-//                    mouse_state[2] = -15;
-//                    break;
-//
-//                case KC_MS_LEFT:
-//                    mouse_state[1] = -15;
-//                    break;
-//
-//                case KC_MS_RIGHT:
-//                    mouse_state[1] = 15;
-//                    break;
-//
-//                case KC_MS_BTN1:
-//                    mouse_state[0] = 1;
-//                    break;
-//
-//                case KC_MS_BTN2:
-//                    mouse_state[0] = 2;
-//                    break;
-//
-//                case KC_MS_WH_UP:
-//                    mouse_state[3] = 1;
-//                    break;
-//                case KC_MS_WH_DOWN:
-//                    mouse_state[3] = -1;
-//                    break;
-//            }
-//            xQueueSend(mouse_q,(void*)&mouse_state, (TickType_t) 0);
-//            mouse_state[0] = 0;
-//            mouse_state[1] = 0;
-//            mouse_state[2] = 0;
-//            mouse_state[3] = 0;
-//            xQueueSend(mouse_q,(void*)&mouse_state, (TickType_t) 0);
-//        }
-		//Review Macro actions
-//        else if(action >= MACRO_BASE_VAL && action < MACRO_BASE_VAL + MACROS_NUM)
-//        {
-//            //ESP_LOGI("Encoder","Macro detected %d", action);
-//            uint8_t i;
-//            for (i = 0; i < MACRO_LEN; i++) {
-//                uint16_t key = macros[action - MACRO_BASE_VAL][i];
-//                if (key == KC_NO)
-//                {
-//                    break;
-//                }
-//                key_state[2+i] = key;
-//                modifier |= check_key_modifier(key);
-//
-//                //ESP_LOGI("KEY sent", "macroid: %d", key);
-//            }
-//            key_state[0] = modifier;
-//            xQueueSend(keyboard_q,(void*)&key_state, (TickType_t) 0);
-//            for (i = 0; i < MACRO_LEN; i++) {
-//                uint16_t key = macros[action - MACRO_BASE_VAL][i];
-//                if (key == KC_NO)
-//                {
-//                    break;
-//                }
-//                key_state[2+i] = 0;
-//                modifier &= ~check_key_modifier(key);
-//            }
-//            key_state[0] = modifier;
-//            xQueueSend(keyboard_q,(void*)&key_state, (TickType_t) 0);
-//        }
-		//Review Key actions
-		else {
+			// xQueueSend(media_q, (void* )&media_state, (TickType_t ) 0); // Reset command
+	} else {
 			ESP_LOGI("Gesture", "Regular key detected: %d", action);
 			key_state[2] = action;
-			xQueueSend(keyboard_q, (void* )&key_state, (TickType_t ) 0);
+			// xQueueSend(keyboard_q, (void* )&key_state, (TickType_t ) 0);
 			key_state[2] = 0;
-			xQueueSend(keyboard_q, (void* )&key_state, (TickType_t ) 0);
+			// xQueueSend(keyboard_q, (void* )&key_state, (TickType_t ) 0);
 		}
 	}
 
@@ -329,15 +252,3 @@ void config_interrup_pin(void) {
 			(void*) interrupt_pin);
 
 }
-
-///////////////
-
-// void test() {
-
-// 	apds9960_init();
-// //	apds9960_gesture_init(apds9960);
-// 	vTaskDelay(pdMS_TO_TICKS(1000));
-// 	apds9960_test_gesture();
-// 	apds9960_deinit();
-// }
-

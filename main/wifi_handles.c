@@ -23,7 +23,6 @@
 #include <sys/param.h>
 
 #include "esp_netif.h"
-#include "esp_http_server.h"
 #include "lwip/err.h"
 #include "lwip/sys.h"
 
@@ -36,7 +35,6 @@
 #include "key_definitions.h"
 #include "nvs_funcs.h"
 #include "esp_vfs.h"
-#include "server.h"
 
 #include "mdns.h"
 #include "spiffs.h"
@@ -55,29 +53,6 @@ bool wifi_connected = false;
 bool wifi_ap_mode = false;
 
 static const char *TAG = "wifi_handler";
-
-static void disconnect_handler(void *arg, esp_event_base_t event_base,
-							   int32_t event_id, void *event_data)
-{
-	httpd_handle_t *server = (httpd_handle_t *)arg;
-	if (*server)
-	{
-		ESP_LOGI(TAG, "Stopping webserver");
-		stop_webserver(*server);
-		*server = NULL;
-	}
-}
-
-static void connect_handler(void *arg, esp_event_base_t event_base,
-							int32_t event_id, void *event_data)
-{
-	httpd_handle_t *server = (httpd_handle_t *)arg;
-	if (*server == NULL)
-	{
-		ESP_LOGI(TAG, "Starting webserver");
-		*server = start_webserver(CONFIG_EXAMPLE_WEB_MOUNT_POINT);
-	}
-}
 
 //////////////////////////WIFI AP//////////////////////////////////////////
 
@@ -311,31 +286,6 @@ void wifi_scan_sta(void)
 }
 ///////////////////////////////////////////////////////////////////////////////////
 
-static void initialise_mdns(void)
-{
-
-	// initialize mDNS
-	ESP_ERROR_CHECK(mdns_init());
-	// set mDNS hostname (required if you want to advertise services)
-	ESP_ERROR_CHECK(mdns_hostname_set(MDNS_HOST_NAME));
-	ESP_LOGI(TAG, "mdns hostname set to: [%s]", MDNS_HOST_NAME);
-	// set default mDNS instance name
-	ESP_ERROR_CHECK(mdns_instance_name_set(MDNS_INSTANCE));
-
-	// structure with TXT records
-	mdns_txt_item_t serviceTxtData[3] = {
-		{"board", "esp32"},
-		{"u", "user"},
-		{"p", "password"}};
-
-	// initialize service
-	ESP_ERROR_CHECK(mdns_service_add("ESP32-WebServer", "_http", "_tcp", 80, serviceTxtData, 3));
-
-	// add another TXT item
-	ESP_ERROR_CHECK(mdns_service_txt_item_set("_http", "_tcp", "path", "/foobar"));
-	// change TXT item value
-	ESP_ERROR_CHECK(mdns_service_txt_item_set_with_explicit_value_len("_http", "_tcp", "u", "admin", strlen("admin")));
-}
 void resetWifi(void *params)
 {
 	vTaskDelay(1000 / portTICK_PERIOD_MS);
@@ -355,22 +305,20 @@ void wifiInit(void *params)
 	// nvs_set_str(nvs, "pass", "pass");
 	// nvs_close(nvs);
 
-	static httpd_handle_t server = NULL;
 	wifi_ap_mode = false;
 
 	ESP_ERROR_CHECK(esp_netif_init());
 	ESP_ERROR_CHECK(esp_event_loop_create_default());
 
-	ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_AP_STAIPASSIGNED, &connect_handler, &server));
-	ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &connect_handler, &server));
-	ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, WIFI_EVENT_STA_DISCONNECTED, &disconnect_handler, &server));
+	// ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_AP_STAIPASSIGNED, &connect_handler, &server));
+	// ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &connect_handler, &server));
+	// ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, WIFI_EVENT_STA_DISCONNECTED, &disconnect_handler, &server));
 
 	while (true)
 	{
 
 		if (xSemaphoreTake(Wifi_initSemaphore, portMAX_DELAY))
 		{
-			// initialise_mdns();
 			if (wifi_reset)
 			{
 				// server = NULL;

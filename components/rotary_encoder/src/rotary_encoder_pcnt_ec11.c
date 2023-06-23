@@ -23,7 +23,7 @@
 
 #include "key_definitions.h"
 #include "keyboard_config.h"
-#include "hal_ble.h"
+#include "queue.h"
 
 static const char *TAG = "rotary_encoder";
 

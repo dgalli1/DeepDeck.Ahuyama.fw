@@ -36,14 +36,6 @@ void deinit_oled(void);
  * */
 void waiting_oled(void);
 
-/** @brief connected graphic
- * */
-void ble_connected_oled(void);
-
-/** @brief connected graphic
- * */
-void ble_slave_oled(void);
-
 /**
  * @brief
  *

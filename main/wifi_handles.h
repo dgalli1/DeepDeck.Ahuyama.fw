@@ -48,7 +48,7 @@
 #define EXAMPLE_ESP_WIFI_PASS "DeepDeck"
 #define EXAMPLE_ESP_WIFI_CHANNEL 11
 #define EXAMPLE_MAX_STA_CONN 4
-
+#define MAX_APs 20
 
 void wifi_init_sta(bool mode, char *ssdi, char *pas);
 void event_handler(void *arg, esp_event_base_t event_base,

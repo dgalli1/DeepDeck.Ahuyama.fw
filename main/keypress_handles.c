@@ -24,12 +24,13 @@
 #include "esp_log.h"
 #include "keymap.c"
 #include "matrix.h"
-#include "hal_ble.h"
 #include "oled_tasks.h"
 #include "nvs_keymaps.h"
 #include "nvs_funcs.h"
 #include "plugin_manager.h"
 #include "rgb_led.h"
+#include "queue.h"
+
 
 #define KEY_PRESS_TAG "KEY_PRESS"
 

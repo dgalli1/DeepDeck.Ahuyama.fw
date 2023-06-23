@@ -40,12 +40,6 @@ void oled_task(void *pvParameters);
  */
 void gesture_task(void *pvParameters);
 
-/**
- * @brief Task that hanldes battery status and report to screen and BT.
- * 
- * @param pvParameters 
- */
-void battery_reports(void *pvParameters);
 
 /**
  * @brief Task that hanldes the key pressing of the mechanical keys

@@ -24,5 +24,7 @@ ENV PATH="/opt/esp/tools/cmake/3.20.3/bin:${PATH}"
 ENV PATH="/opt/esp/tools/openocd-esp32/v0.10.0-esp32-20211111/openocd-esp32/bin:${PATH}"
 ENV PATH="/opt/esp/python_env/idf4.4_py3.8_env/bin:${PATH}"
 ENV PATH="/opt/esp/idf/tools:${PATH}"
+RUN chown -R root:root /home/workspace
+RUN chmod -R 777 /home/workspace
 RUN cmake /home/workspace/
 RUN make

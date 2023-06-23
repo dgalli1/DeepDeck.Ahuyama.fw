@@ -17,7 +17,6 @@
 
 //MK32 functions
 #include "keypress_handles.c"
-#include "battery_monitor.h"
 #include "nvs_funcs.h"
 
 #include "esp_err.h"
@@ -26,8 +25,6 @@
 #include "rgb_led.h"
 #include "menu.h"
 
-//HID Ble functions
-#include "hal_ble.h"
 
 #include "keycode_conv.h"
 #include "gesture_handles.h"
@@ -56,12 +53,11 @@ bool DEEP_SLEEP = true; // flag to check if we need to go to deep sleep
 
 void oled_task(void *pvParameters) {
 	deepdeck_status = S_NORMAL;
-	ble_connected_oled();
 	bool CON_LOG_FLAG = false; // Just because I don't want it to keep logging the same thing a billion times
 	while (1) {
 		switch (deepdeck_status) {
 		case S_NORMAL:
-			if (halBLEIsConnected() == 0) {
+			if (true) { //@todo this was a check for ble should be mqtt
 				if (CON_LOG_FLAG == false) {
 					ESP_LOGI(TAG, "Not connected, waiting for connection ");
 				}
@@ -69,9 +65,6 @@ void oled_task(void *pvParameters) {
 				DEEP_SLEEP = false;
 				CON_LOG_FLAG = true;
 			} else {
-				if (CON_LOG_FLAG == true) {
-					ble_connected_oled();
-				}
 				update_oled();
 				CON_LOG_FLAG = false;
 			}
@@ -82,7 +75,6 @@ void oled_task(void *pvParameters) {
 			vTaskDelay(pdMS_TO_TICKS(200));
 
 			menu_screen();
-			ble_connected_oled();
 
 			deepdeck_status = S_NORMAL;
 			//release gesture sensor again
@@ -101,7 +93,7 @@ void gesture_task(void *pvParameters) {
 		if ( xSemaphoreTake( xSemaphore, 10 ) == pdTRUE) {
 
 			//Do not send anything if queues are uninitialized
-			if (keyboard_q == NULL || joystick_q == NULL) {
+			if (keyboard_q == NULL) {
 				ESP_LOGE(TAG, "queues not initialized");
 				continue;
 			}
@@ -122,29 +114,6 @@ void gesture_task(void *pvParameters) {
 
 }
 
-void battery_reports(void *pvParameters) {
-	//uint8_t past_battery_report[1] = { 0 };
-
-	while (1) {
-		uint32_t bat_level = get_battery_level();
-		//if battery level is above 100, we're charging
-		if (bat_level > 100) {
-			bat_level = 100;
-			//if charging, do not enter deepsleep
-			DEEP_SLEEP = false;
-		}
-		void *pReport = (void*) &bat_level;
-
-		ESP_LOGI("Battery Monitor", "battery level %d", bat_level);
-		if (BLE_EN == 1) {
-			xQueueSend(battery_q, pReport, (TickType_t ) 0);
-		}
-		if (input_str_q != NULL) {
-			xQueueSend(input_str_q, pReport, (TickType_t ) 0);
-		}
-		vTaskDelay(60 * 1000 / portTICK_PERIOD_MS);
-	}
-}
 
 void key_reports(void *pvParameters) {
 	// Arrays for holding the report at various stages
@@ -156,7 +125,7 @@ void key_reports(void *pvParameters) {
 				sizeof report_state);
 
 		//Do not send anything if queues are uninitialized
-		if (mouse_q == NULL || keyboard_q == NULL || joystick_q == NULL) {
+		if (mouse_q == NULL || keyboard_q == NULL) {
 			ESP_LOGE(TAG, "queues not initialized");
 			continue;
 		}
@@ -189,7 +158,9 @@ void key_reports(void *pvParameters) {
 #endif
 
 			if (BLE_EN == 1) {
-				xQueueSend(keyboard_q, pReport, (TickType_t ) 0);
+				// @todo send command to mqtt?
+				// xQueueSend(keyboard_q, pReport, (TickType_t ) 0);
+
 			}
 			if (input_str_q != NULL) {
 				xQueueSend(input_str_q, pReport, (TickType_t ) 0);
@@ -291,56 +262,3 @@ void encoder_report(void *pvParameters) {
 		taskYIELD();
 	}
 }
-
-/*If no key press has been recieved in SLEEP_MINS amount of minutes, put device into deep sleep
- *  wake up on touch on GPIO pin 2
- *  */
-#ifdef SLEEP_MINS
-void deep_sleep(void *pvParameters) {
-
-	uint64_t initial_time = esp_timer_get_time(); // notice that timer returns time passed in microseconds!
-	uint64_t current_time_passed = 0;
-	uint8_t force_sleep = false;
-	while (1) {
-		current_time_passed = (esp_timer_get_time() - initial_time);
-
-		if (DEEP_SLEEP == false) {
-			current_time_passed = 0;
-			initial_time = esp_timer_get_time();
-			DEEP_SLEEP = true;
-		}
-		if (menu_get_goto_sleep()) {
-			force_sleep = true;
-			DEEP_SLEEP = true;
-		}
-
-		if ((((double) current_time_passed / USEC_TO_SEC)
-				>= (double) (SEC_TO_MIN * SLEEP_MINS)) || force_sleep) {
-			if (DEEP_SLEEP == true) {
-				force_sleep = false;
-				ESP_LOGE(SYSTEM_REPORT_TAG, "going to sleep!");
-#ifdef OLED_ENABLE
-				vTaskDelay(20 / portTICK_PERIOD_MS);
-				vTaskSuspend(xOledTask);
-				deinit_oled();
-#endif
-				// wake up esp32 using rtc gpio
-				rtc_matrix_setup();
-				esp_sleep_enable_touchpad_wakeup();
-				esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_ON);
-				esp_deep_sleep_start();
-
-			}
-			if (DEEP_SLEEP == false) {
-				current_time_passed = 0;
-				initial_time = esp_timer_get_time();
-				DEEP_SLEEP = true;
-			}
-		}
-
-		vTaskDelay(pdMS_TO_TICKS(10));
-
-	}
-
-}
-#endif
