@@ -119,11 +119,6 @@ char menu_led_mode[5][MENU_CHAR_NUM] =
 menu_item_t m_led_array[] = 
 {
     //Descripción                 //Acción             //Siguiente menu      ó     //Función
-    {menu_led_mode[0],      MA_FUNCTION,               NONE,                       &menu_rgb_mode_0},
-    {menu_led_mode[1],      MA_FUNCTION,               NONE,                       &menu_rgb_mode_1},
-    {menu_led_mode[2],      MA_FUNCTION,               NONE,                       &menu_rgb_mode_2},
-    {menu_led_mode[3],      MA_FUNCTION,               NONE,                       &menu_rgb_mode_3},
-    {menu_led_mode[4],      MA_FUNCTION,               NONE,                       &menu_rgb_mode_4},
     {0,                           MA_END,                 0,                          0}
 };
 
@@ -496,36 +491,3 @@ uint8_t menu_get_goto_sleep(void)
   return goto_sleep;
 }
 
-uint8_t menu_send_rgb_mode(uint8_t mode)
-{
-  int mode_t = mode;
-  xQueueSend(keyled_q, &mode_t, 0);
-
-  return mret_none; 
-}
-
-// ToDo: Optimize this
-uint8_t menu_rgb_mode_0(void)
-{
-  return menu_send_rgb_mode(0);
-}
-
-uint8_t menu_rgb_mode_1(void)
-{
-  return menu_send_rgb_mode(1);
-}
-
-uint8_t menu_rgb_mode_2(void)
-{
-  return menu_send_rgb_mode(2);
-}
-
-uint8_t menu_rgb_mode_3(void)
-{
-  return menu_send_rgb_mode(3);
-}
-
-uint8_t menu_rgb_mode_4(void)
-{
-  return menu_send_rgb_mode(4);
-}

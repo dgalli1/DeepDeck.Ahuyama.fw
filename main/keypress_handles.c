@@ -224,23 +224,19 @@ uint8_t *check_key_state(dd_layer *keymap)
 				if (matrix_state[row][col] == matrix_prev_state[row][col])
 					continue;
 
-#ifdef RGB_LEDS
-				rgb_key_led_press(row, col); // report the pressed key
-#endif
+
 
 				uint16_t report_index = (2 + col + row * KEYMAP_COLS);
+				#ifdef RGB_LEDS
+				//log row and col and result
+				ESP_LOGI("Keyboard task", "row: %d, col: %d, result: %d", row, col, row * col);
+				ESP_LOGI("Keyboard task", "report_index: %d", report_index);
+				color_key my_color_key = {360, 100, 1, col + row * KEYMAP_COLS };
+				ESP_LOGI("Keyboard task", "try to send to queue");
 
+				xQueueSend(keyled_q, &my_color_key, 100);
+				#endif
 				keycode = keymap->key_map[row][col];
-				// ESP_LOGW("---", "keycode: %d", keycode);
-				// //checking if the keycode is transparent
-				// if (keycode == KC_TRNS) {
-				// 	if (current_layout == 0) {
-				// 		keycode = *default_layouts[MAX_LAYER][row][col];
-				// 	} else {
-				// 		keycode =
-				// 				*default_layouts[current_layout - 1][row][col];
-				// 	}
-				// }
 
 				led_status = check_led_status(keycode);
 				if (matrix_state[row][col - MATRIX_COLS * pad] == 1)
