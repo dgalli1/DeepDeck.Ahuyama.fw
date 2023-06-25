@@ -16,6 +16,7 @@
 #include "oled_tasks.h"
 
 #define FIRMWARE_VERSION "3.5.4"
+#define MQTT_BROKER_URL "mqtt://192.168.178.81"
 #define MODULE_ID "ESP32"
 #define GATTS_TAG "Ahuyama" // The device's name
 #define MAX_BT_DEVICENAME_LENGTH 40

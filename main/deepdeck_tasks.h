@@ -70,4 +70,12 @@ void encoder_report(void *pvParameters);
  */
 void deep_sleep(void *pvParameters);
 
+
+/**
+ * @brief Init listening to mqtt messages
+ * 
+ * @param pvParameters
+ */
+void mqtt_task(void *pvParameters);
+
 #endif

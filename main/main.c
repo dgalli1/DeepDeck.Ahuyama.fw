@@ -62,7 +62,6 @@
 #include "keyboard_config.h"
 #include "nvs_funcs.h"
 #include "nvs_keymaps.h"
-#include "mqtt.h"
 
 #include "esp_err.h"
 

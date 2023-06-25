@@ -29,6 +29,8 @@
 #include "keycode_conv.h"
 #include "gesture_handles.h"
 #include "wifi_handles.h"
+#include "mqtt.h"
+
 
 static const char *TAG = "KeyReport";
 
@@ -171,11 +173,16 @@ void key_reports(void *pvParameters) {
 }
 
 void rgb_leds_task(void *pvParameters) {
-
 	rgb_key_led_init();
 	rgb_notification_led_init();
-	while (1) {
-		key_led_modes();
+	key_led_modes();
+}
+
+void mqtt_task(void *pvParameters) {
+	mqtt_init();
+	while (true)
+	{
+		vTaskDelay(pdMS_TO_TICKS(10000));  // Delay for 100 milliseconds
 	}
 }
 

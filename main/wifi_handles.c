@@ -35,6 +35,7 @@
 #include "key_definitions.h"
 #include "nvs_funcs.h"
 #include "esp_vfs.h"
+#include "deepdeck_tasks.h"
 
 #include "mdns.h"
 #include "spiffs.h"
@@ -233,6 +234,10 @@ void wifi_init_sta(bool mode, char *ssid, char *pass)
 		myflag = false;
 		wifi_ap_mode = false;
 		wifi_connected = true;
+		xTaskCreate(mqtt_task, "mqtt task", 4096, NULL,
+			5, NULL);
+		ESP_LOGI("mqtt_task", "initialized");
+
 	}
 	else if (bits & WIFI_FAIL_BIT)
 	{
